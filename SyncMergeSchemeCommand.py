@@ -1,27 +1,31 @@
-import sublime, sublime_plugin
-import os, json
+import os, sublime, sublime_plugin
 from .packages.appdirs import user_data_dir
 
 class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
     def __init__(self):
-        package_dir = os.path.join(user_data_dir('Sublime Merge'), 'Packages/User')
-
-        self.settings_files = [
-            os.path.join(package_dir, 'Commit Message - Merge.sublime-settings'),
-            os.path.join(package_dir, 'Commit Message - Merge Dark.sublime-settings'),
-            os.path.join(package_dir, 'Diff - Merge.sublime-settings'),
-            os.path.join(package_dir, 'Diff - Merge Dark.sublime-settings'),
-            os.path.join(package_dir, 'File Mode - Merge.sublime-settings'),
-            os.path.join(package_dir, 'File Mode - Merge Dark.sublime-settings'),
+        self.sm_package_dir = os.path.join(user_data_dir('Sublime Merge'), 'Packages/User')
+        self.sm_settings_files = [
+            'Commit Message - Merge.sublime-settings',
+            'Commit Message - Merge Dark.sublime-settings',
+            'Diff - Merge.sublime-settings',
+            'Diff - Merge Dark.sublime-settings',
+            'File Mode - Merge.sublime-settings',
+            'File Mode - Merge Dark.sublime-settings',
         ]
 
     def run(self):
-        color_scheme = sublime.active_window().active_view().settings().get('color_scheme')
+        st_color_scheme = sublime.load_settings('Preferences.sublime-settings').get('color_scheme')
 
-        for settings_file in self.settings_files:
-            with open(settings_file, 'r') as f:
-                current_settings = json.load(f)
+        for file_name in self.sm_settings_files:
+            file_path = os.path.join(self.sm_package_dir, file_name)
 
-            with open(settings_file, 'w') as f:
-                current_settings['color_scheme'] = color_scheme
-                json.dump(current_settings, f, indent = 4, sort_keys = True)
+            try:
+                with open(file_path, 'r') as file:
+                    sm_current_settings = sublime.decode_value(file.read())
+            except:
+                sm_current_settings = {}
+            finally:
+                sm_current_settings['color_scheme'] = st_color_scheme
+
+            with open(file_path, 'w') as file:
+                file.write(sublime.encode_value(sm_current_settings, pretty = True))
