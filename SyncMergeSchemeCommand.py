@@ -1,10 +1,10 @@
-import os, re, sublime, sublime_plugin
-from .packages.appdirs import user_data_dir
+import re, sublime, sublime_plugin
+from os import path
 from .packages.debounce import debounce
 
 class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
     def __init__(self):
-        self.sm_package_dir = os.path.join(user_data_dir('Sublime Merge'), 'Packages/User')
+        self.sm_package_dir = self.resolve_sm_package_dir()
         self.sm_settings_files = [
             'Commit Message - Merge.sublime-settings',
             'Commit Message - Merge Dark.sublime-settings',
@@ -22,7 +22,7 @@ class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
 
     def sync_color_scheme(self, color_scheme):
         for file_name in self.sm_settings_files:
-            file_path = os.path.join(self.sm_package_dir, file_name)
+            file_path = path.join(self.sm_package_dir, file_name)
 
             try:
                 with open(file_path, 'r') as file:
@@ -36,7 +36,7 @@ class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
                 file.write(sublime.encode_value(sm_current_settings, pretty = True))
 
     def update_sm_preferences(self, color_scheme):
-        sm_preferences_path = os.path.join(self.sm_package_dir, 'Preferences.sublime-settings')
+        sm_preferences_path = path.join(self.sm_package_dir, 'Preferences.sublime-settings')
 
         with open(sm_preferences_path, 'r') as file:
             sm_preferences = sublime.decode_value(file.read())
@@ -48,3 +48,14 @@ class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
 
         with open(sm_preferences_path, 'w') as file:
             file.write(sublime.encode_value(sm_preferences, pretty = True))
+
+    def resolve_sm_package_dir():
+        # if configuration has been specified, apply that
+        # TODO: load path from configuration too...
+
+        # else, figure out based on the Sublime Text installation path
+        st_path = path.realpath(path.join(sublime.cache_path().replace('/Cache', ''), '..'))
+        sm_path = path.join(st_path, 'Sublime Merge')
+
+        return path.join(sm_path, 'Packages/User')
+
