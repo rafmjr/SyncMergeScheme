@@ -4,6 +4,7 @@ from .packages.debounce import debounce
 
 class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
     def __init__(self):
+        self.sm_path = sublime.load_settings('SyncMergeScheme.sublime-settings').get('sublime_merge_path')
         self.sm_package_dir = self.resolve_sm_package_dir()
         self.sm_settings_files = [
             'Commit Message - Merge.sublime-settings',
@@ -49,13 +50,11 @@ class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
         with open(sm_preferences_path, 'w') as file:
             file.write(sublime.encode_value(sm_preferences, pretty = True))
 
-    def resolve_sm_package_dir():
-        # if configuration has been specified, apply that
-        # TODO: load path from configuration too...
+    def resolve_sm_package_dir(self):
+        # if user has specified the installation path, resolve package directory based on that
+        if self.sm_path:
+            return path.join(self.sm_path, 'Packages/User')
 
         # else, figure out based on the Sublime Text installation path
         st_path = path.realpath(path.join(sublime.cache_path().replace('/Cache', ''), '..'))
-        sm_path = path.join(st_path, 'Sublime Merge')
-
-        return path.join(sm_path, 'Packages/User')
-
+        return path.join(st_path, 'Sublime Merge/Packages/User')
