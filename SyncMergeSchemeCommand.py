@@ -53,8 +53,8 @@ class SyncMergeSchemeCommand(sublime_plugin.ApplicationCommand):
     def resolve_sm_package_dir(self):
         # if user has specified the installation path, resolve package directory based on that
         if self.sm_path:
-            return path.join(self.sm_path, 'Packages/User')
+            return path.join(self.sm_path, 'Packages', 'User')
 
         # else, figure out based on the Sublime Text installation path
-        st_path = path.realpath(path.join(sublime.cache_path().replace('/Cache', ''), '..'))
-        return path.join(st_path, 'Sublime Merge/Packages/User')
+        st_path = path.realpath(path.join(sublime.cache_path().replace('Cache', ''), '..'))
+        return path.join(st_path, 'Sublime Merge', 'Packages', 'User')
