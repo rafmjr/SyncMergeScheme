@@ -44,7 +44,7 @@ path:
 
 ```
 {
-    // Absolute path where Sublime Merge settings should live in your machien
+    // Absolute path where Sublime Merge settings should live in your machine
     "sublime_merge_path": "C:\\Users\\<USER>\\AppData\\Roaming\\Sublime Merge",
 }
 ```
